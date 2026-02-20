@@ -1,0 +1,212 @@
+<div class="shell">
+
+    <header class="top">
+        <div class="brand">
+            <div class="logo">RM</div>
+            <div class="title">
+            <h1>Pokemon Character Finder</h1>
+            <p>Consumes <span class="mono">GET /api/character/&#123;id&#125;</span> and renders a neat little card.</p>
+            </div>
+        </div>
+     </header>
+     <br>
+    <div class="two-columns">
+        <!-- Primera sección para pokemon/{id} -->
+        <div>     
+            <h2>Información de un Pokemon</h2>
+            <div class="controls card">
+                <label class="lbl">Character ID</label>
+                <div class="row">
+                <input
+                    class="input"
+                    type="string"
+                    min="1"
+                    [(ngModel)]="pokemonId"
+                    (keyup.enter)="loadPokemon()"
+                    placeholder="e.g. 108" />
+                <button class="btn" (click)="loadPokemon()" [disabled]="state() === 'loading'">
+                    <span *ngIf="state() !== 'loading'">Fetch</span>
+                    <span *ngIf="state() === 'loading'" class="spinner" aria-label="loading"></span>
+                </button>
+                </div>
+
+                <div class="hint">
+                Tip: try <button class="link" (click)="quick(1)">1</button>,
+                <button class="link" (click)="quick(2)">2</button>,
+                <button class="link" (click)="quick(108)">108</button>,
+                <button class="link" (click)="quick(826)">826</button>.
+                </div>
+            </div>
+            <br>
+            <main>
+                <section class="card hero" *ngIf="state() === 'idle'">
+                    <h2>Ready when you are ✨</h2>
+                    <p>Enter an ID and hit <b>Fetch</b>. This UI will call the public Rick & Morty API and show the character info.</p>
+                    <div class="mini">
+                    <div class="pill">No libraries</div>
+                    <div class="pill">Standalone component</div>
+                    <div class="pill">HttpClient (fetch adapter)</div>
+                    </div>
+                </section>
+
+                <section class="card hero" *ngIf="state() === 'error'">
+                    <h2>That ID didn't work 👀</h2>
+                    <p class="muted">{{ errorMsg() }}</p>
+                    <p class="muted">Try another ID (1..826) or check your internet connection.</p>
+                </section>
+
+                <section class="card character" *ngIf="state() === 'success' && pokemon() as c">
+                    <div class="media">
+                    <img [src]="c.sprites.front_default" [alt]="c.name" />
+                    </div>
+
+                    <div class="content">
+                    <div class="headline">
+                        <h2>{{ c.name | titlecase }}</h2>
+
+                        <div class="sub">
+                        <span class="chip">Type: {{ primaryType() }}</span>
+                        <span class="chip">Height: {{ c.height }}</span>
+                        <span class="chip">Weight: {{ c.weight }}</span>
+                        </div>
+                    </div>
+
+                    <div class="facts">
+                        <div class="fact">
+                        <div class="k">Base experience</div>
+                        <div class="v">{{ c.base_experience }}</div>
+                        </div>
+
+                        <div class="fact">
+                        <div class="k">Abilities</div>
+                        <div class="v">
+                            {{ abilityNames() }}
+                        </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <a class="btn ghost" [href]="endpointPreview()" target="_blank">Open API URL</a>
+                        <a class="btn ghost" [href]="docsUrl" target="_blank">Docs</a>
+                    </div>
+                    </div>
+                </section>
+                <br>
+         <!--       <section class="card raw" *ngIf="state() === 'success' && pokemon() as c">
+                    <div class="rawTop">
+                    <h3>Raw JSON</h3>
+                    <button class="btn tiny ghost" (click)="copyJson()" [disabled]="!c">Copy</button>
+                    </div>
+                    <pre>{{ c | json }}</pre>
+                </section> -->
+            </main>
+        </div>
+        <!-- Segunda seccion para pokemon-especies/{id} -->
+        <div>
+            <h2>Pokemon: Informacion de Especie</h2>
+            <div class="controls card">
+                <label class="lbl">Species ID</label>
+                <div class="row">
+                    <input
+                        class="input"
+                        type="string"
+                        min="1"
+                        placeholder="e.g. 108" />
+                    <button class="btn">
+                        <span>Fetch Species</span>
+                        <span class="spinner" aria-label="loading"></span>
+                    </button>
+                </div>
+
+                <div class="hint">
+                    Tip: try 
+                </div>
+            </div>
+
+            <main class="grid">
+                <section class="card hero">
+                    <h2>Species info ready ✨</h2>
+                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
+                </section>
+
+                <section class="card hero" >
+                    <h2>That ID didn't work 👀</h2>
+                    <p class="muted">Try another ID or check your internet connection.</p>
+                </section>
+            </main>
+        </div>
+        <!-- Tercera seccion para pokemon-move/{id} -->
+        <div>
+            <h2>Pokemon: Información de un movimiento</h2>
+            <div class="controls card">
+                <label class="lbl">Move ID</label>
+                <div class="row">
+                    <input
+                        class="input"
+                        type="string"
+                        min="1"
+                        placeholder="e.g. 108" />
+                    <button class="btn">
+                        <span>Fetch Species</span>
+                        <span class="spinner" aria-label="loading"></span>
+                    </button>
+                </div>
+
+                <div class="hint">
+                    Tip: try 
+                </div>
+            </div>
+
+            <main class="grid">
+                <section class="card hero">
+                    <h2>Species info ready ✨</h2>
+                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
+                </section>
+
+                <section class="card hero" >
+                    <h2>That ID didn't work 👀</h2>
+                    <p class="muted">Try another ID or check your internet connection.</p>
+                </section>
+            </main>
+        </div>
+        <!-- Cuarta seccion para pokemon-chain/{id} -->
+        <div>
+            <h2>Pokemon: Cadena de evolución</h2>
+            <div class="controls card">
+                <label class="lbl">Species ID</label>
+                <div class="row">
+                    <input
+                        class="input"
+                        type="string"
+                        min="1"
+                        placeholder="e.g. 108" />
+                    <button class="btn">
+                        <span>Fetch Species</span>
+                        <span class="spinner" aria-label="loading"></span>
+                    </button>
+                </div>
+
+                <div class="hint">
+                    Tip: try 
+                </div>
+            </div>
+
+            <main class="grid">
+                <section class="card hero">
+                    <h2>Species info ready ✨</h2>
+                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
+                </section>
+
+                <section class="card hero" >
+                    <h2>That ID didn't work 👀</h2>
+                    <p class="muted">Try another ID or check your internet connection.</p>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <footer class="foot">
+      <span class="muted">Angular 21 + HttpClient. Endpoint: </span>
+      <span class="mono">{{ endpointPreview() }}</span>
+    </footer>
+</div>
