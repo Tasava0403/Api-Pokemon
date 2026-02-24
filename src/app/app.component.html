@@ -112,7 +112,7 @@
                         type="string"
                         min="1"
                         placeholder="e.g. 108" />
-                    <button class="btn">
+                    <button class="btn" (click) ="loadSpecies()">
                         <span>Fetch Species</span>
                         <span class="spinner" aria-label="loading"></span>
                     </button>
@@ -133,6 +133,73 @@
                     <h2>That ID didn't work 👀</h2>
                     <p class="muted">Try another ID or check your internet connection.</p>
                 </section>
+               <section class="card hero" *ngIf="species() as s">
+
+                    <h2>{{ s.name | titlecase }} (ID: {{ s.id }})</h2>
+
+                    <p><strong>Order:</strong> {{ s.order }}</p>
+                    <p><strong>Gender Rate:</strong> {{ s.gender_rate }}</p>
+                    <p><strong>Capture Rate:</strong> {{ s.capture_rate }}</p>
+                    <p><strong>Base Happiness:</strong> {{ s.base_happiness }}</p>
+                    <p><strong>Hatch Counter:</strong> {{ s.hatch_counter }}</p>
+
+                    <hr>
+
+                    <p><strong>Is Baby:</strong> {{ s.is_baby }}</p>
+                    <p><strong>Is Legendary:</strong> {{ s.is_legendary }}</p>
+                    <p><strong>Is Mythical:</strong> {{ s.is_mythical }}</p>
+                    <p><strong>Has Gender Differences:</strong> {{ s.has_gender_differences }}</p>
+                    <p><strong>Forms Switchable:</strong> {{ s.forms_switchable }}</p>
+
+                    <hr>
+
+                    <p><strong>Growth Rate:</strong> {{ s.growth_rate.name }}</p>
+                    <p><strong>Color:</strong> {{ s.color.name }}</p>
+                    <p><strong>Shape:</strong> {{ s.shape.name }}</p>
+                    <p><strong>Habitat:</strong> {{ s.habitat?.name || 'Unknown' }}</p>
+                    <p><strong>Generation:</strong> {{ s.generation.name }}</p>
+
+                    <hr>
+
+                    <p><strong>Evolves From:</strong> 
+                        {{ s.evolves_from_species?.name || 'Base Form' }}
+                    </p>
+
+                    <p><strong>Evolution Chain URL:</strong> 
+                        {{ s.evolution_chain.url }}
+                    </p>
+
+                    <hr>
+
+                    <h3>Pokedex Numbers</h3>
+                    <div *ngFor="let entry of s.pokedex_numbers">
+                        {{ entry.pokedex.name }} → #{{ entry.entry_number }}
+                    </div>
+
+                    <h3>Egg Groups</h3>
+                    <div *ngFor="let egg of s.egg_groups">
+                        {{ egg.name }}
+                    </div>
+
+                    <h3>Genera</h3>
+                    <div *ngFor="let g of s.genera">
+                        {{ g.genus }} ({{ g.language.name }})
+                    </div>
+
+                    <h3>Names</h3>
+                    <div *ngFor="let n of s.names">
+                        {{ n.name }} ({{ n.language.name }})
+                    </div>
+
+                    <h3>Varieties</h3>
+                    <div *ngFor="let v of s.varieties">
+                        {{ v.pokemon.name }} (Default: {{ v.is_default }})
+                    </div>
+
+                    <h3>Flavor Text (EN)</h3>
+                    <p>{{ getEnglishFlavorText() }}</p>
+
+                    </section>
             </main>
         </div>
         <!-- Tercera seccion para pokemon-move/{id} -->
