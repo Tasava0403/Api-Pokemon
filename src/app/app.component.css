@@ -160,6 +160,34 @@
       line-height: 1.35;
     }
 
+    .facts-wrapper {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 2 columnas */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    /* Full width cards */
+    .facts-full {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Responsive */
+    @media (max-width: 560px){
+      .facts-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .foot{
       margin-top: 18px;
       padding: 12px 14px;

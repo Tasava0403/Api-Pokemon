@@ -101,20 +101,21 @@
                 </section> -->
             </main>
         </div>
-        <!-- Segunda seccion para pokemon-especies/{id} -->
+         <!-- Cuarta seccion para pokemon-chain/{id} -->
         <div>
-            <h2>Pokemon: Informacion de Especie</h2>
+            <h2>Pokemon: Cadena de evolución</h2>
             <div class="controls card">
                 <label class="lbl">Species ID</label>
                 <div class="row">
                     <input
                         class="input"
-                        type="string"
+                        type="number"
                         min="1"
-                        placeholder="e.g. 108" />
-                    <button class="btn">
-                        <span>Fetch Species</span>
-                        <span class="spinner" aria-label="loading"></span>
+                        [(ngModel)]="pokemonChainId"
+                        placeholder="e.g. 1" />
+                    <button class="btn" (click)="loadEvolutionChain()"  [disabled]="chainState() === 'loading'">
+                        <span *ngIf="chainState() !== 'loading'">Fetch Species</span>
+                        <span *ngIf="chainState() === 'loading'" class="spinner"></span>
                     </button>
                 </div>
 
@@ -122,18 +123,37 @@
                     Tip: try 
                 </div>
             </div>
-
-            <main class="grid">
-                <section class="card hero">
-                    <h2>Species info ready ✨</h2>
-                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
+            <br>
+            <section class="card hero" *ngIf="chainState() === 'idle'">
+                <h2>Evolution chain ready 🔄</h2>
+                <p>Enter an ID and fetch the evolution chain.</p>
                 </section>
 
-                <section class="card hero" >
-                    <h2>That ID didn't work 👀</h2>
-                    <p class="muted">Try another ID or check your internet connection.</p>
+                <section class="card hero" *ngIf="chainState() === 'error'">
+                <h2>That ID didn't work 👀</h2>
+                <p class="muted">{{ chainErrorMsg() }}</p>
                 </section>
-            </main>
+
+                <section class="card character" *ngIf="chainState() === 'success' && chain()">
+                <div class="media">
+                    <img *ngIf="chainImage()" [src]="chainImage()" width="120">
+                </div>
+                <div class="content">
+                    <h2>Evolution Chain</h2>
+
+                    <div class="facts">
+                    <div class="fact" *ngFor="let name of evolutionNames()">
+                        <div class="v">{{ name }}</div>
+                    </div>
+                    </div>
+
+                    <div class="actions">
+                    <a class="btn ghost" [href]="endpointPreviewChain()" target="_blank">
+                        Open Evolution Chain API URL
+                    </a>
+                    </div>
+                </div>
+            </section>
         </div>
         <!-- Tercera seccion para pokemon-move/{id} -->
         <div>
@@ -143,12 +163,17 @@
                 <div class="row">
                     <input
                         class="input"
-                        type="string"
+                        type="number"
                         min="1"
+                        [(ngModel)] = "pokemonMoveId"
                         placeholder="e.g. 108" />
-                    <button class="btn">
-                        <span>Fetch Species</span>
-                        <span class="spinner" aria-label="loading"></span>
+                    <button class="btn"
+                            (click)="loadMove()"
+                            [disabled]="moveState() === 'loading'">
+
+                    <span *ngIf="moveState() !== 'loading'">Fetch</span>
+                    <span *ngIf="moveState() === 'loading'" class="spinner"></span>
+
                     </button>
                 </div>
 
@@ -156,33 +181,98 @@
                     Tip: try 
                 </div>
             </div>
-
-            <main class="grid">
-                <section class="card hero">
-                    <h2>Species info ready ✨</h2>
-                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
+            <br>
+            <section class="card hero" *ngIf="moveState() === 'idle'">
+                <h2>Move ready ⚡</h2>
+                <p>Enter a Move ID and fetch the data.</p>
                 </section>
 
-                <section class="card hero" >
-                    <h2>That ID didn't work 👀</h2>
-                    <p class="muted">Try another ID or check your internet connection.</p>
+                <section class="card hero" *ngIf="moveState() === 'error'">
+                <h2>That Move ID didn't work 👀</h2>
+                <p class="muted">{{ moveErrorMsg() }}</p>
                 </section>
-            </main>
+
+                <section class="card character" *ngIf="moveState() === 'success' && move() as m">
+                    <div class="media">
+                        <img *ngIf="moveImage()" [src]="moveImage()" width="120">
+                    </div>
+                    <div class="content">
+                        <h2>Move Information</h2>
+
+                        <div>
+
+                        <!-- GRID 2x3 -->
+                        <div class="facts-grid">
+                            <div class="fact">
+                            <div class="k">Type</div>
+                            <div class="v">{{ m.type?.name || 'N/A' }}</div>
+                            </div>
+
+                            <div class="fact">
+                            <div class="k">Damage Class</div>
+                            <div class="v">{{ m.damage_class?.name }}</div>
+                            </div>
+
+                            <div class="fact">
+                            <div class="k">Power</div>
+                            <div class="v">{{ m.power ?? 'N/A' }}</div>
+                            </div>
+
+                            <div class="fact">
+                            <div class="k">Accuracy</div>
+                            <div class="v">{{ m.accuracy ?? 'N/A' }}</div>
+                            </div>
+
+                            <div class="fact">
+                            <div class="k">PP</div>
+                            <div class="v">{{ m.pp ?? 'N/A' }}</div>
+                            </div>
+
+                            <div class="fact">
+                            <div class="k">Priority</div>
+                            <div class="v">{{ m.priority ?? 0 }}</div>
+                            </div>
+                        </div>
+
+                        <!-- FULL WIDTH -->
+                        <div class="facts-full">
+                            <div class="fact full">
+                            <div class="k">Effect</div>
+                            <div class="v">{{ moveEffect() }}</div>
+                            </div>
+
+                            <div class="fact full">
+                            <div class="k">Flavor Text</div>
+                            <div class="v">{{ moveFlavor() }}</div>
+                            </div>
+                        </div>
+
+                        </div>
+
+                        <div class="actions">
+                        <a class="btn ghost" [href]="endpointPreviewMove()" target="_blank">
+                            Open Move API URL
+                        </a>
+                    </div>
+                </div>
+            </section>
         </div>
-        <!-- Cuarta seccion para pokemon-chain/{id} -->
+         <!-- Segunda seccion para pokemon-especies/{id} -->
         <div>
-            <h2>Pokemon: Cadena de evolución</h2>
+            <h2>Pokemon: Informacion de Especie</h2>
             <div class="controls card">
                 <label class="lbl">Species ID</label>
                 <div class="row">
                     <input
                         class="input"
-                        type="string"
+                        type="number"
                         min="1"
+                        [(ngModel)]="speciesId"
+                        (keyup.enter)="loadSpecies()"
                         placeholder="e.g. 108" />
-                    <button class="btn">
-                        <span>Fetch Species</span>
-                        <span class="spinner" aria-label="loading"></span>
+                    <button class="btn" (click)="loadSpecies()" [disabled]="speciesState() === 'loading'">
+                        <span *ngIf="speciesState() !== 'loading'">Fetch Species</span>
+                        <span *ngIf="speciesState() === 'loading'" class="spinner"></span>
                     </button>
                 </div>
 
@@ -192,15 +282,73 @@
             </div>
 
             <main class="grid">
-                <section class="card hero">
-                    <h2>Species info ready ✨</h2>
-                    <p>Enter an ID and hit <b>Fetch Species</b> to get Pokemon species information.</p>
-                </section>
+               <section class="card hero" *ngIf="species() as s">
 
-                <section class="card hero" >
-                    <h2>That ID didn't work 👀</h2>
-                    <p class="muted">Try another ID or check your internet connection.</p>
-                </section>
+                    <h2>{{ s.name | titlecase }} (ID: {{ s.id }})</h2>
+
+                    <p><strong>Order:</strong> {{ s.order }}</p>
+                    <p><strong>Gender Rate:</strong> {{ s.gender_rate }}</p>
+                    <p><strong>Capture Rate:</strong> {{ s.capture_rate }}</p>
+                    <p><strong>Base Happiness:</strong> {{ s.base_happiness }}</p>
+                    <p><strong>Hatch Counter:</strong> {{ s.hatch_counter }}</p>
+
+                    <hr>
+
+                    <p><strong>Is Baby:</strong> {{ s.is_baby }}</p>
+                    <p><strong>Is Legendary:</strong> {{ s.is_legendary }}</p>
+                    <p><strong>Is Mythical:</strong> {{ s.is_mythical }}</p>
+                    <p><strong>Has Gender Differences:</strong> {{ s.has_gender_differences }}</p>
+                    <p><strong>Forms Switchable:</strong> {{ s.forms_switchable }}</p>
+
+                    <hr>
+
+                    <p><strong>Growth Rate:</strong> {{ s.growth_rate.name }}</p>
+                    <p><strong>Color:</strong> {{ s.color.name }}</p>
+                    <p><strong>Shape:</strong> {{ s.shape.name }}</p>
+                    <p><strong>Habitat:</strong> {{ s.habitat?.name || 'Unknown' }}</p>
+                    <p><strong>Generation:</strong> {{ s.generation.name }}</p>
+
+                    <hr>
+
+                    <p><strong>Evolves From:</strong> 
+                        {{ s.evolves_from_species?.name || 'Base Form' }}
+                    </p>
+
+                    <p><strong>Evolution Chain URL:</strong> 
+                        {{ s.evolution_chain.url }}
+                    </p>
+
+                    <hr>
+
+                    <h3>Pokedex Numbers</h3>
+                    <div *ngFor="let entry of s.pokedex_numbers">
+                        {{ entry.pokedex.name }} → #{{ entry.entry_number }}
+                    </div>
+
+                    <h3>Egg Groups</h3>
+                    <div *ngFor="let egg of s.egg_groups">
+                        {{ egg.name }}
+                    </div>
+
+                    <h3>Genera</h3>
+                    <div *ngFor="let g of s.genera">
+                        {{ g.genus }} ({{ g.language.name }})
+                    </div>
+
+                    <h3>Names</h3>
+                    <div *ngFor="let n of s.names">
+                        {{ n.name }} ({{ n.language.name }})
+                    </div>
+
+                    <h3>Varieties</h3>
+                    <div *ngFor="let v of s.varieties">
+                        {{ v.pokemon.name }} (Default: {{ v.is_default }})
+                    </div>
+
+                    <h3>Flavor Text (EN)</h3>
+                    <p>{{ getEnglishFlavorText() }}</p>
+
+                    </section>
             </main>
         </div>
     </div>
